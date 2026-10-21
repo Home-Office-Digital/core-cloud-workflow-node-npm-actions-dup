@@ -1,0 +1,124 @@
+# Dependabot only reads this configuration after it is merged into the default
+# branch. Version updates are checked on the schedule below; queued PRs are not
+# guaranteed to appear at an exact time.
+#
+# To check or manually request an update after merge, use Insights >
+# Dependency graph > Dependabot > Check for updates. Security alerts and
+# security updates also require the repository's dependency graph, alerts, and
+# security updates settings to be enabled; this file cannot enable those
+# repository settings.
+#
+# Grouping applies to new update PRs, not existing ones. Routine version groups
+# do not retroactively combine open PRs. Security grouping can replace existing
+# security PRs; review any resulting replacement deliberately.
+version: 2
+
+updates:
+  # This repository has no root package.json. Keep the valid app and the
+  # non-audit regression fixtures current, grouping compatible routine updates
+  # across these directories. Both production and development dependencies are
+  # included; major version updates remain separate for deliberate review.
+  #
+  # tests/audit-invalid is intentionally omitted: its vulnerable dependency
+  # data is used by self-test-validation.yml to assert that npm audit fails.
+  # This omission is not a blanket security ignore and does not disable alerts.
+  # Repository-level alerts/security-update settings can still act on
+  # unconfigured manifests; maintainers should assess any alert or security PR
+  # against that fixture deliberately.
+  - package-ecosystem: npm
+    directories:
+      - /tests/valid-app
+      - /tests/build-invalid
+      - /tests/lint-invalid
+      - /tests/test-invalid
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/London
+    # This caps routine version-update PRs for this ecosystem. Security PRs
+    # have separate alert-driven triggering and GitHub-managed limits; they
+    # are not held until this weekly schedule.
+    open-pull-requests-limit: 5
+    # Let Dependabot rebase open PRs automatically when the base branch moves.
+    rebase-strategy: auto
+    commit-message:
+      prefix: "build(deps)"
+    # These labels are absent in this test fork; create them manually before
+    # testing. Do not assign a fixed SemVer label to every update: major and
+    # minor updates need a different release decision. Maintainers must create
+    # and add an appropriate major/minor/patch or skip-release label to each PR
+    # because this repository's PR workflow requires one.
+    labels:
+      - dependencies
+      - javascript
+    # Groups are checked in order. The two related families stay together;
+    # the final group catches all remaining minor/patch updates across folders.
+    # Since major is not listed, major routine updates remain individual PRs.
+    groups:
+      next-family:
+        patterns:
+          - next
+          - eslint-config-next
+        update-types:
+          - minor
+          - patch
+      react-family:
+        patterns:
+          - react
+          - react-dom
+          - "@types/react"
+          - "@types/react-dom"
+        update-types:
+          - minor
+          - patch
+      other-routine:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      # This group is independent of the routine groups and allows security
+      # fixes of every version level, including major upgrades.
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  # The root directory covers workflow files. Each composite-action directory
+  # is listed explicitly so references in its action.yml are also maintained;
+  # these locations do not overlap.
+  - package-ecosystem: github-actions
+    directories:
+      - /
+      - /actions/audit
+      - /actions/build
+      - /actions/lint
+      - /actions/publish
+      - /actions/setup
+      - /actions/test
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Europe/London
+    # This limit applies to routine version updates only. Security updates are
+    # triggered separately by alerts and use their own GitHub-managed limits.
+    open-pull-requests-limit: 5
+    rebase-strategy: auto
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - dependencies
+      - javascript
+    groups:
+      routine-actions:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
