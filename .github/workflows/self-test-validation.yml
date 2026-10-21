@@ -15,7 +15,7 @@ jobs:
     name: Test - Invalid Node npm audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up node and deps
         uses: ./actions/setup
@@ -40,7 +40,7 @@ jobs:
     name: Test - Invalid Node npm lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up node and deps
         uses: ./actions/setup
@@ -65,7 +65,7 @@ jobs:
     name: Test - Invalid Node npm test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up node and deps
         uses: ./actions/setup
